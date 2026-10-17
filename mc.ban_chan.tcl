@@ -1,5 +1,5 @@
 ##
-# Ban Channel v1.0.3 by MC_8 - Carl M. Gregory <gregory@worldinter.net>
+# Ban Channel v1.0.4 by MC_8 - Carl M. Gregory <gregory@worldinter.net>
 #
 # If you have any questions/comments/idea's, please email me!
 # ( Include the script name and version in the title, if you do email me. )
@@ -32,6 +32,12 @@
 ##
 # History
 ##
+#  v1.0.4 (08.29.01)
+#   MC_8 - Daniele 'Mopirelli' Buricusardu - Fixed "Tcl error [mc:banc:raw319]:
+#                                            can't read "nothing": no such 
+#                                            variable".  Happens when the user
+#                                            leaves the channel in the middle
+#                                            of a scan.
 #  v1.0.3 (07.27.01)
 #   MC_8 - Ahmad - Script would warn, wait x min's, then rescan... it wasn't
 #                  doing the rescan, rather just performing the post punishment.
@@ -154,8 +160,8 @@ set mc_banc(svs:stableonly) 0
 
 ### END OF CONFIG OPTIONS ###
 
-set mc_banc(version) "v1.0.3"
-set mc_banc(svs:script) "banchan 001000003000"
+set mc_banc(version) "v1.0.4"
+set mc_banc(svs:script) "banchan 001000004000"
 set mc_banc(svs:server) "mc.purehype.net 8085"
 
 set mc_banc(+chan) [string tolower $mc_banc(+chan)]
@@ -225,7 +231,7 @@ bind raw - 319 mc:banc:raw319
 proc mc:banc:raw319 {from key args} {
  global mc_banc
  set args [join $args]
- set nick [lindex [split $args] 1]
+ set nick [lindex $args 1]
  set chan(x) ""
  foreach chan(y) [join [string trimleft [lrange [split $args] 2 e] :]] {
   set chan(x) "$chan(x) [string trimleft $chan(y) -+@]"
@@ -437,7 +443,7 @@ proc mc:bc:inter:masktype {uhost type} {
    }
    if {$nick == ""} {set uhost $nick!} {set uhost "$nick![mc:bc:inter:gethost $nick]"}
   }
-  if {$uhost == "$nick!" || $nothing} {set type "return_nothing"}
+  if {$uhost == "$nick!"} {set type "return_nothing"}
  }
  switch -exact $type {
   0 {set ban "*[string range $uhost [string first ! $uhost] e]"}
